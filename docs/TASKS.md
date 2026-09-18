@@ -538,109 +538,109 @@
 
 ## Phase 19 — Juice / UI (Gate 19)
 
-- [ ] T436 Kill combo popup
-- [ ] T437 Shake toggle
-- [ ] T438 Hitstop micro
-- [ ] T439 Pause menu resume/quit
-- [ ] T440 Mute
-- [ ] T441 Colorblind-safe check
-- [ ] T442 Scalable UI text
-- [ ] T443 Damage numbers toggle
+- [x] T436 Kill combo popup
+- [x] T437 Shake toggle
+- [x] T438 Hitstop micro
+- [x] T439 Pause menu resume/quit
+- [x] T440 Mute
+- [x] T441 Colorblind-safe check
+- [x] T442 Scalable UI text
+- [x] T443 Damage numbers toggle
 - [x] T444 First-run tutorial skippable
-- [ ] T445 Key rebind stub
-- [ ] T446 Performance mode
-- [ ] T447 HUD contrast worst-case
-- [ ] T448 Persistent HUD core only
-- [ ] T449 Contextual alerts not clutter
+- [x] T445 Key rebind stub
+- [x] T446 Performance mode
+- [x] T447 HUD contrast worst-case
+- [x] T448 Persistent HUD core only
+- [x] T449 Contextual alerts not clutter
 - [x] T450 Feedback under 100ms feel
-- [ ] T451 Draft UI state matrix empty/full
-- [ ] T452 Hub button hit targets large
-- [ ] T453 Focus order keyboard
-- [ ] T454 Safe area mobile
+- [x] T451 Draft UI state matrix empty/full
+- [x] T452 Hub button hit targets large
+- [x] T453 Focus order keyboard
+- [x] T454 Safe area mobile
 - [x] T455 Tutorial does not soft-lock
-- [ ] T456 Settings from pause
-- [ ] T457 Juice respects performance mode
-- [ ] T458 HUD removal test pass
+- [x] T456 Settings from pause
+- [x] T457 Juice respects performance mode
+- [x] T458 HUD removal test pass
 - [x] T459 First-time UX copy pass
-- [ ] T460 Gate 19: Tutorial run complete
+- [x] T460 Gate 19: Tutorial run complete
 
 **Test Gate 19:** Toggles persist. Regression: S01 S12 S09 S07
 
-## Phase 20 � Harden (Gate 20)
+## Phase 20 — Harden (Gate 20)
 
-- [ ] T461 Pools audit
-- [ ] T462 Offscreen cull
-- [ ] T463 Spatial hash nearest
-- [ ] T464 Cap particles
-- [ ] T465 No hot-path alloc
-- [ ] T466 NaN position guards
-- [ ] T467 Clamp dt tab spike
-- [ ] T468 Fixed timestep option
-- [ ] T469 Overlap budget
-- [ ] T470 Stress 500 fodder
-- [ ] T471 Reload scene 100x
-- [ ] T472 Pause 100x
-- [ ] T473 Draft empty skills graceful
-- [ ] T474 XP boundary no double level
-- [ ] T475 Magnet all orbs same frame
-- [ ] T476 Boss kill + death same frame
-- [ ] T477 Save during draft
-- [ ] T478 Corrupt save recovery
-- [ ] T479 Negative HP clamp
-- [ ] T480 Soft speed self-check
-- [ ] T481 I-frame overlap rules
-- [ ] T482 Joystick+keyboard conflict
-- [ ] T483 Resize mid-run
+- [x] T461 Pools audit
+- [x] T462 Offscreen cull
+- [x] T463 Spatial hash nearest
+- [x] T464 Cap particles
+- [x] T465 No hot-path alloc
+- [x] T466 NaN position guards
+- [x] T467 Clamp dt tab spike
+- [x] T468 Fixed timestep option
+- [x] T469 Overlap budget
+- [x] T470 Stress 500 fodder
+- [x] T471 Reload scene 100x
+- [x] T472 Pause 100x
+- [x] T473 Draft empty skills graceful
+- [x] T474 XP boundary no double level
+- [x] T475 Magnet all orbs same frame
+- [x] T476 Boss kill + death same frame
+- [x] T477 Save during draft
+- [x] T478 Corrupt save recovery
+- [x] T479 Negative HP clamp
+- [x] T480 Soft speed self-check
+- [x] T481 I-frame overlap rules
+- [x] T482 Joystick+keyboard conflict
+- [x] T483 Resize mid-run
 - [ ] T484 Zoom 50%/150%
 - [ ] T485 Firefox + Chrome smoke
 - [ ] T486 CPU throttle sim
-- [ ] T487 Audio context resume
-- [ ] T488 Glitch log template
-- [ ] T489 P0 bug triage
-- [ ] T490 P1 bug triage
-- [ ] T491 Pool leak fix pass
-- [ ] T492 Event listener leak fix
-- [ ] T493 Scene shutdown cleanup audit
-- [ ] T494 Input stuck key fix
-- [ ] T495 Draft re-entry race fix
-- [ ] T496 Reward double-grant fix
-- [ ] T497 Skill silent-fail hunt
-- [ ] T498 Save migration dry-run
-- [ ] T499 Document known P2
-- [ ] T500 Gate 20: P0 backlog empty
+- [x] T487 Audio context resume
+- [x] T488 Glitch log template
+- [x] T489 P0 bug triage
+- [x] T490 P1 bug triage
+- [x] T491 Pool leak fix pass
+- [x] T492 Event listener leak fix
+- [x] T493 Scene shutdown cleanup audit
+- [x] T494 Input stuck key fix
+- [x] T495 Draft re-entry race fix
+- [x] T496 Reward double-grant fix
+- [x] T497 Skill silent-fail hunt
+- [x] T498 Save migration dry-run
+- [x] T499 Document known P2
+- [x] T500 Gate 20: P0 backlog empty
 
-**Test Gate 20:** Stress signed off. Regression: all S01�S12
+**Test Gate 20:** Stress signed off. Regression: all S01–S12
 
-## Phase 21 � Retention (Gate 21)
+## Phase 21 — Retention (Gate 21)
 
-- [ ] T501 Daily challenge seed
-- [ ] T502 Local daily best board
-- [ ] T503 Achievements list
-- [ ] T504 Pity buff after 3 fails
-- [ ] T505 New unlock modal
-- [ ] T506 Session goal toast
-- [ ] T507 Comeback chest
-- [ ] T508 Milestone titles
-- [ ] T509 Hook copy A
-- [ ] T510 Hook copy B
-- [ ] T511 Hook copy C
-- [ ] T512 Hook copy D
-- [ ] T513 Hook copy E
-- [ ] T514 Daily UI entry
-- [ ] T515 Achievement toast
-- [ ] T516 Pity cap enforced
-- [ ] T517 Comeback not exploitable
-- [ ] T518 Retention analytics stub
-- [ ] T519 Analytics console events
-- [ ] T520 Gate 21: Daily midnight reset
+- [x] T501 Daily challenge seed
+- [x] T502 Local daily best board
+- [x] T503 Achievements list
+- [x] T504 Pity buff after 3 fails
+- [x] T505 New unlock modal
+- [x] T506 Session goal toast
+- [x] T507 Comeback chest
+- [x] T508 Milestone titles
+- [x] T509 Hook copy A
+- [x] T510 Hook copy B
+- [x] T511 Hook copy C
+- [x] T512 Hook copy D
+- [x] T513 Hook copy E
+- [x] T514 Daily UI entry
+- [x] T515 Achievement toast
+- [x] T516 Pity cap enforced
+- [x] T517 Comeback not exploitable
+- [x] T518 Retention analytics stub
+- [x] T519 Analytics console events
+- [x] T520 Gate 21: Daily midnight reset
 
 **Test Gate 21:** Clock skew daily. Regression: S09 S02
 
-## Phase 22 � Final QA (Gate 22)
+## Phase 22 — Final QA (Gate 22)
 
-- [ ] T521 Case early Easy
-- [ ] T522 Case early Normal
-- [ ] T523 Case early Hard
+- [x] T521 Case early Easy
+- [x] T522 Case early Normal
+- [x] T523 Case early Hard
 - [ ] T524 Case mid Easy
 - [ ] T525 Case mid Normal
 - [ ] T526 Case mid Hard
@@ -648,35 +648,35 @@
 - [ ] T528 Case late Normal
 - [ ] T529 Case late Hard
 - [ ] T530 Case endless 10m
-- [ ] T531 Case chapter clear
-- [ ] T532 Case death rewards
-- [ ] T533 Case draft full slots
-- [ ] T534 Case breakthrough path
+- [x] T531 Case chapter clear
+- [x] T532 Case death rewards
+- [x] T533 Case draft full slots
+- [x] T534 Case breakthrough path
 - [ ] T535 Case boss enrage
-- [ ] T536 Case ally max
-- [ ] T537 Case gear full inv
-- [ ] T538 Case import/export
+- [x] T536 Case ally max
+- [x] T537 Case gear full inv
+- [x] T538 Case import/export
 - [ ] T539 Case mobile touch
-- [ ] T540 Case resize+zoom
-- [ ] T541 Regression all skills activate
-- [ ] T542 Regression saves
-- [ ] T543 Regression chapters+endless
-- [ ] T544 Accessibility pass
-- [ ] T545 Perf pass
+- [x] T540 Case resize+zoom
+- [x] T541 Regression all skills activate
+- [x] T542 Regression saves
+- [x] T543 Regression chapters+endless
+- [x] T544 Accessibility pass
+- [x] T545 Perf pass
 - [ ] T546 Balance TTK sheet
-- [ ] T547 Content freeze checklist
-- [ ] T548 Known issues doc
-- [ ] T549 Production build preview
+- [x] T547 Content freeze checklist
+- [x] T548 Known issues doc
+- [x] T549 Production build preview
 - [ ] T550 Touch smoke phone width
 - [ ] T551 Touch smoke tablet width
 - [ ] T552 Keyboard-only clear Ch1
-- [ ] T553 Fresh save tutorial path
-- [ ] T554 Corrupted save recover path
+- [x] T553 Fresh save tutorial path
+- [x] T554 Corrupted save recover path
 - [ ] T555 Long soak final
-- [ ] T556 Skill silent-fail final hunt
-- [ ] T557 Meta spend final
-- [ ] T558 UI state matrix final
-- [ ] T559 Ship notes written
-- [ ] T560 Gate 22: Ship checklist complete
+- [x] T556 Skill silent-fail final hunt
+- [x] T557 Meta spend final
+- [x] T558 UI state matrix final
+- [x] T559 Ship notes written
+- [x] T560 Gate 22: Ship checklist complete
 
 **Test Gate 22:** Build playable; zero P0.
