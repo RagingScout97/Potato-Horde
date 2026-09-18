@@ -45,8 +45,6 @@ import {
   getPityDamageMult,
   hookCopy,
 } from '@/systems/Retention';
-import { loadSave as _ls } from '@/save/SaveManager';
-void _ls;
 
 type HubView = 'home' | 'upgrades' | 'gear' | 'heroes' | 'settings' | 'daily' | 'achievements';
 
@@ -155,6 +153,12 @@ export class HubScene extends Phaser.Scene {
       case 'settings':
         this.drawSettings();
         break;
+      case 'daily':
+        this.drawDaily();
+        break;
+      case 'achievements':
+        this.drawAchievements();
+        break;
     }
   }
 
@@ -208,16 +212,98 @@ export class HubScene extends Phaser.Scene {
         },
       ],
       ['CHAPTERS', '#38bdf8', () => fadeToScene(this, 'ChapterSelect', 180)],
+      ['DAILY CHALLENGE', '#22d3ee', () => this.setView('daily')],
+      ['ACHIEVEMENTS', '#fbbf24', () => this.setView('achievements')],
       ['UPGRADES', '#fbbf24', () => this.setView('upgrades')],
       ['GEAR', '#c084fc', () => this.setView('gear')],
       ['HEROES', '#f97316', () => this.setView('heroes')],
       ['SETTINGS', '#94a3b8', () => this.setView('settings')],
     ];
     rows.forEach(([label, color, fn], i) => {
-      this.navBtn(cx, 150 + i * 52, label, color, fn);
+      this.navBtn(cx, 140 + i * 48, label, color, fn);
     });
 
+    const pity = getPityDamageMult();
+    if (pity > 1) {
+      this.layer.add(
+        this.add
+          .text(cx, 530, `Pity buff active: +${Math.round((pity - 1) * 100)}% damage`, {
+            fontFamily: Fonts.ui,
+            fontSize: '13px',
+            color: '#4ade80',
+          })
+          .setOrigin(0.5),
+      );
+    }
+
     this.navBtn(cx, 680, '[ MENU ]', '#64748b', () => fadeToScene(this, 'Menu', 200));
+  }
+
+  private drawDaily(): void {
+    const board = getDailyBoard();
+    const cx = GameConfig.logicalWidth / 2;
+    this.layer.add(
+      this.add
+        .text(cx, 80, 'DAILY CHALLENGE', {
+          fontFamily: Fonts.display,
+          fontSize: '24px',
+          color: '#22d3ee',
+        })
+        .setOrigin(0.5),
+    );
+    this.layer.add(
+      this.add
+        .text(
+          cx,
+          140,
+          `Day ${board.day}\nSeed ${board.seed}\nBest kills ${board.bestKills}\nBest time ${Math.floor(board.bestSeconds / 60)}:${String(Math.floor(board.bestSeconds % 60)).padStart(2, '0')}\n\n${hookCopy(2)}`,
+          {
+            fontFamily: Fonts.ui,
+            fontSize: '16px',
+            color: '#e2e8f0',
+            align: 'center',
+          },
+        )
+        .setOrigin(0.5, 0),
+    );
+    this.navBtn(cx, 420, 'PLAY DAILY (seeded endless)', '#22d3ee', () => {
+      unlockAchievement('daily_try');
+      void createDailyRng(); // seed reserved for future draft RNG wiring
+      setPendingRun({ mode: 'endless' });
+      fadeToScene(this, 'Game', 180);
+    });
+    this.navBtn(cx, 660, '[ BACK ]', '#94a3b8', () => this.setView('home'));
+  }
+
+  private drawAchievements(): void {
+    const cx = GameConfig.logicalWidth / 2;
+    this.layer.add(
+      this.add
+        .text(cx, 72, 'ACHIEVEMENTS', {
+          fontFamily: Fonts.display,
+          fontSize: '24px',
+          color: '#fbbf24',
+        })
+        .setOrigin(0.5),
+    );
+    ACHIEVEMENTS.forEach((a, i) => {
+      const unlocked = hasAchievement(a.id);
+      this.layer.add(
+        this.add
+          .text(
+            cx,
+            130 + i * 48,
+            `${unlocked ? '✓' : '○'} ${a.name} — ${a.desc}`,
+            {
+              fontFamily: Fonts.ui,
+              fontSize: '15px',
+              color: unlocked ? '#4ade80' : '#64748b',
+            },
+          )
+          .setOrigin(0.5),
+      );
+    });
+    this.navBtn(cx, 660, '[ BACK ]', '#94a3b8', () => this.setView('home'));
   }
 
   private setView(v: HubView): void {
