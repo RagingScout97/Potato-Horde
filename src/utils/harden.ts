@@ -33,8 +33,8 @@ export function isFinitePos(x: number, y: number): boolean {
 export function sanitizePos(
   x: number,
   y: number,
-  fallbackX = GameConfig.arena.centerX,
-  fallbackY = GameConfig.arena.centerY,
+  fallbackX: number = GameConfig.arena.centerX,
+  fallbackY: number = GameConfig.arena.centerY,
 ): { x: number; y: number } {
   return {
     x: Number.isFinite(x) ? x : fallbackX,
