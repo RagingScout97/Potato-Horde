@@ -4,6 +4,7 @@ import type { DraftCard } from '@/systems/RunBuild';
 import { Fonts } from '@/ui/fonts';
 import { attachButtonFeedback } from '@/ui/buttonFeedback';
 import { loadSave } from '@/save/SaveManager';
+import { UiChrome } from '@/ui/chrome';
 
 /**
  * Level-up draft modal — 3 cards, click or 1/2/3 (T151–T168, T189, T212).
@@ -32,17 +33,17 @@ export class DraftUI {
         GameConfig.logicalHeight / 2,
         GameConfig.logicalWidth,
         GameConfig.logicalHeight,
-        0x020617,
-        0.72,
+        UiChrome.dim,
+        0.78,
       )
       .setScrollFactor(0);
     this.content.add(dim);
 
     const title = scene.add
-      .text(GameConfig.logicalWidth / 2, 110, 'LEVEL UP — PICK A SKILL', {
+      .text(GameConfig.logicalWidth / 2, 96, 'LEVEL UP — PICK A SKILL', {
         fontFamily: Fonts.display,
         fontSize: '24px',
-        color: '#fbbf24',
+        color: UiChrome.accentCss,
       })
       .setOrigin(0.5)
       .setScrollFactor(0);
@@ -51,12 +52,12 @@ export class DraftUI {
     const hint = scene.add
       .text(
         GameConfig.logicalWidth / 2,
-        GameConfig.logicalHeight - 48,
+        GameConfig.logicalHeight - 40,
         'Keys 1 / 2 / 3 or click · R reroll · Esc stays open',
         {
           fontFamily: Fonts.ui,
           fontSize: '13px',
-          color: '#94a3b8',
+          color: UiChrome.mutedCss,
         },
       )
       .setOrigin(0.5)
@@ -64,10 +65,10 @@ export class DraftUI {
     this.content.add(hint);
 
     this.rerollText = scene.add
-      .text(GameConfig.logicalWidth / 2, GameConfig.logicalHeight - 78, '', {
+      .text(GameConfig.logicalWidth / 2, GameConfig.logicalHeight - 72, '', {
         fontFamily: Fonts.ui,
         fontSize: '14px',
-        color: '#38bdf8',
+        color: UiChrome.accentCss,
       })
       .setOrigin(0.5)
       .setScrollFactor(0)
@@ -188,61 +189,71 @@ export class DraftUI {
       this.cards.push(emptyWrap);
       return;
     }
-    const w = 220;
-    const h = 180;
-    const gap = 24;
+    const w = 228;
+    const h = 196;
+    const gap = 32;
     const total = cards.length * w + (cards.length - 1) * gap;
     const startX = GameConfig.logicalWidth / 2 - total / 2 + w / 2;
-    const y = GameConfig.logicalHeight / 2;
+    const y = GameConfig.logicalHeight / 2 + 8;
 
     cards.forEach((card, i) => {
       const x = startX + i * (w + gap);
       const c = this.scene.add.container(x, y).setScrollFactor(0);
-      const stroke = card.breakthrough ? 0xf472b6 : card.recommended ? 0xfbbf24 : 0x64748b;
+      const stroke = card.breakthrough ? 0xf472b6 : card.recommended ? UiChrome.accent : UiChrome.stroke;
       const bg = this.scene.add
-        .rectangle(0, 0, w, h, card.breakthrough ? 0x3b1d3a : card.recommended ? 0x1e3a5f : 0x1e293b)
+        .rectangle(
+          0,
+          0,
+          w,
+          h,
+          card.breakthrough
+            ? UiChrome.evolveBg
+            : card.recommended
+              ? UiChrome.recommendBg
+              : UiChrome.panel,
+        )
         .setStrokeStyle(2, stroke)
         .setInteractive({ useHandCursor: true });
 
       attachButtonFeedback(this.scene, bg, { hoverScale: 1.04, pressScale: 0.97 });
 
       const glyph = this.scene.add
-        .rectangle(0, -58, 28, 28, card.glyphColor)
-        .setStrokeStyle(2, 0xf8fafc, 0.5)
+        .rectangle(0, -62, 28, 28, card.glyphColor)
+        .setStrokeStyle(2, 0xf5f0e6, 0.5)
         .setScrollFactor(0);
 
       const key = this.scene.add
-        .text(-w / 2 + 12, -h / 2 + 10, String(i + 1), {
+        .text(-w / 2 + 14, -h / 2 + 12, String(i + 1), {
           fontFamily: Fonts.ui,
           fontSize: '16px',
-          color: '#94a3b8',
+          color: UiChrome.mutedCss,
         })
         .setScrollFactor(0);
       const name = this.scene.add
-        .text(0, -22, card.name, {
+        .text(0, -24, card.name, {
           fontFamily: Fonts.display,
           fontSize: '16px',
-          color: '#f8fafc',
-          align: 'center',
-          wordWrap: { width: w - 20 },
-        })
-        .setOrigin(0.5)
-        .setScrollFactor(0);
-      const desc = this.scene.add
-        .text(0, 22, card.description, {
-          fontFamily: Fonts.ui,
-          fontSize: '12px',
-          color: '#cbd5e1',
+          color: UiChrome.textCss,
           align: 'center',
           wordWrap: { width: w - 24 },
         })
         .setOrigin(0.5)
         .setScrollFactor(0);
-      const lvl = this.scene.add
-        .text(0, 68, card.breakthrough ? 'BREAKTHROUGH' : `Lv ${card.nextLevel}`, {
+      const desc = this.scene.add
+        .text(0, 24, card.description, {
           fontFamily: Fonts.ui,
           fontSize: '12px',
-          color: card.breakthrough ? '#f472b6' : '#4ade80',
+          color: '#d4c4a8',
+          align: 'center',
+          wordWrap: { width: w - 28 },
+        })
+        .setOrigin(0.5)
+        .setScrollFactor(0);
+      const lvl = this.scene.add
+        .text(0, 74, card.breakthrough ? 'BREAKTHROUGH' : `Lv ${card.nextLevel}`, {
+          fontFamily: Fonts.ui,
+          fontSize: '12px',
+          color: card.breakthrough ? '#f472b6' : UiChrome.hpCss,
         })
         .setOrigin(0.5)
         .setScrollFactor(0);
@@ -251,7 +262,7 @@ export class DraftUI {
 
       if (card.breakthrough) {
         const badge = this.scene.add
-          .text(0, -82, '★ EVOLVE', {
+          .text(0, -86, '★ EVOLVE', {
             fontFamily: Fonts.ui,
             fontSize: '12px',
             color: '#f472b6',
@@ -261,10 +272,10 @@ export class DraftUI {
         c.add(badge);
       } else if (card.recommended) {
         const rec = this.scene.add
-          .text(0, -82, 'RECOMMENDED', {
+          .text(0, -86, 'RECOMMENDED', {
             fontFamily: Fonts.ui,
             fontSize: '11px',
-            color: '#fbbf24',
+            color: UiChrome.accentCss,
           })
           .setOrigin(0.5)
           .setScrollFactor(0);

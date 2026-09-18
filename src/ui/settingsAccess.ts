@@ -71,12 +71,12 @@ export function cycleUiScale(save: SaveV1 = loadSave()): SaveV1 {
 
 /** Colorblind-safe palette helpers — shapes/labels preferred; accents stay distinct. */
 export const ColorblindSafe = {
-  hp: '#22c55e',
+  hp: '#4ade80',
   hpLow: '#f97316',
   xp: '#eab308',
   danger: '#f43f5e',
-  info: '#38bdf8',
-  muted: '#94a3b8',
+  info: '#e8c070',
+  muted: '#a89880',
   /** Pattern markers for enemy kinds when colorblind mode on */
   meleeMark: '■',
   rangedMark: '▲',

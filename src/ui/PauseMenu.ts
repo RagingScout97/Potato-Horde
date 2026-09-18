@@ -7,9 +7,9 @@ import { GameConfig } from '@/data/GameConfig';
 import { loadSave, writeSave } from '@/save/SaveManager';
 import { Fonts } from '@/ui/fonts';
 import { attachButtonFeedback } from '@/ui/buttonFeedback';
+import { UiChrome } from '@/ui/chrome';
 import {
   applyMuteToGame,
-  ColorblindSafe,
   cycleUiScale,
   scaledPx,
 } from '@/ui/settingsAccess';
@@ -45,27 +45,27 @@ export class PauseMenu {
         GameConfig.logicalHeight / 2,
         GameConfig.logicalWidth,
         GameConfig.logicalHeight,
-        0x020617,
-        0.78,
+        UiChrome.dim,
+        0.8,
       )
       .setScrollFactor(0);
     this.root.add(dim);
 
     const title = this.scene.add
-      .text(GameConfig.logicalWidth / 2, 180, 'PAUSED', {
+      .text(GameConfig.logicalWidth / 2, 168, 'PAUSED', {
         fontFamily: Fonts.display,
         fontSize: scaledPx(40),
-        color: '#fbbf24',
+        color: UiChrome.accentCss,
       })
       .setOrigin(0.5)
       .setScrollFactor(0);
     this.root.add(title);
 
     const hint = this.scene.add
-      .text(GameConfig.logicalWidth / 2, 230, 'P / Esc · Tab cycles · Enter selects', {
+      .text(GameConfig.logicalWidth / 2, 220, 'P / Esc · Tab cycles · Enter selects', {
         fontFamily: Fonts.ui,
         fontSize: scaledPx(12),
-        color: ColorblindSafe.muted,
+        color: UiChrome.mutedCss,
       })
       .setOrigin(0.5)
       .setScrollFactor(0);
@@ -78,7 +78,7 @@ export class PauseMenu {
       ['QUIT TO MENU', () => this.handlers?.onQuit()],
     ];
     btns.forEach(([label, fn], i) => {
-      const t = this.makeBtn(GameConfig.logicalWidth / 2, 300 + i * 64, label, fn);
+      const t = this.makeBtn(GameConfig.logicalWidth / 2, 290 + i * 72, label, fn);
       this.focusables.push(t);
     });
   }
@@ -93,15 +93,15 @@ export class PauseMenu {
       .text(x, y, label, {
         fontFamily: Fonts.display,
         fontSize: scaledPx(22),
-        color: '#e2e8f0',
-        backgroundColor: '#1e293b',
-        padding: { x: 28, y: 14 },
+        color: UiChrome.textCss,
+        backgroundColor: UiChrome.panelCss,
+        padding: { x: 32, y: 16 },
       })
       .setOrigin(0.5)
       .setScrollFactor(0);
     // Large hit target (T452)
     t.setInteractive(
-      new Phaser.Geom.Rectangle(-140, -28, 280, 56),
+      new Phaser.Geom.Rectangle(-150, -32, 300, 64),
       Phaser.Geom.Rectangle.Contains,
     );
     t.input!.cursor = 'pointer';
@@ -124,16 +124,16 @@ export class PauseMenu {
     const cx = GameConfig.logicalWidth / 2;
     this.settingsPanel.add(
       this.scene.add
-        .rectangle(cx, GameConfig.logicalHeight / 2, 520, 420, 0x0f172a, 0.98)
-        .setStrokeStyle(2, 0x38bdf8)
+        .rectangle(cx, GameConfig.logicalHeight / 2, 540, 440, UiChrome.bgDeep, 0.98)
+        .setStrokeStyle(2, UiChrome.accent)
         .setScrollFactor(0),
     );
     this.settingsPanel.add(
       this.scene.add
-        .text(cx, 190, 'RUN SETTINGS', {
+        .text(cx, 178, 'RUN SETTINGS', {
           fontFamily: Fonts.display,
           fontSize: scaledPx(22),
-          color: '#38bdf8',
+          color: UiChrome.accentCss,
         })
         .setOrigin(0.5)
         .setScrollFactor(0),
@@ -204,12 +204,12 @@ export class PauseMenu {
 
     rows.forEach(([label, fn], i) => {
       const t = this.scene.add
-        .text(cx, 240 + i * 40, label, {
+        .text(cx, 230 + i * 44, label, {
           fontFamily: Fonts.ui,
           fontSize: scaledPx(14),
-          color: '#cbd5e1',
-          backgroundColor: '#1e293b',
-          padding: { x: 16, y: 8 },
+          color: UiChrome.textCss,
+          backgroundColor: UiChrome.panelLiftCss,
+          padding: { x: 18, y: 10 },
         })
         .setOrigin(0.5)
         .setScrollFactor(0)
@@ -249,7 +249,7 @@ export class PauseMenu {
       ? (this.focusIndex - 1 + n) % n
       : (this.focusIndex + 1) % n;
     this.focusables.forEach((t, i) => {
-      t.setColor(i === this.focusIndex ? '#fbbf24' : '#e2e8f0');
+      t.setColor(i === this.focusIndex ? UiChrome.accentCss : UiChrome.textCss);
     });
   }
 

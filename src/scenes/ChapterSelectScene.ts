@@ -4,6 +4,7 @@ import { Chapters } from '@/data/chapters';
 import { loadSave } from '@/save/SaveManager';
 import { Fonts } from '@/ui/fonts';
 import { attachButtonFeedback } from '@/ui/buttonFeedback';
+import { UiChrome } from '@/ui/chrome';
 import { fadeToScene } from '@/utils/sceneFade';
 import { setPendingRun } from '@/systems/RunMode';
 
@@ -16,7 +17,7 @@ export class ChapterSelectScene extends Phaser.Scene {
   }
 
   create(): void {
-    this.cameras.main.setBackgroundColor('#0b0f1a');
+    this.cameras.main.setBackgroundColor(UiChrome.bgDeepCss);
     this.cameras.main.fadeIn(200, 0, 0, 0);
     const save = loadSave();
 
@@ -24,15 +25,15 @@ export class ChapterSelectScene extends Phaser.Scene {
       .text(GameConfig.logicalWidth / 2, 48, 'CHAPTERS', {
         fontFamily: Fonts.display,
         fontSize: '32px',
-        color: '#fbbf24',
+        color: UiChrome.accentCss,
       })
       .setOrigin(0.5);
 
     this.add
-      .text(GameConfig.logicalWidth / 2, 88, 'Clear a chapter to unlock the next', {
+      .text(GameConfig.logicalWidth / 2, 92, 'Clear a chapter to unlock the next', {
         fontFamily: Fonts.ui,
         fontSize: '14px',
-        color: '#64748b',
+        color: UiChrome.mutedCss,
       })
       .setOrigin(0.5);
 
@@ -40,19 +41,21 @@ export class ChapterSelectScene extends Phaser.Scene {
     const best = save.meta.chapterBest ?? {};
 
     Chapters.forEach((ch, i) => {
-      const y = 140 + i * 88;
+      const y = 148 + i * 92;
       const isUnlocked = unlocked.has(ch.id);
       const stars = best[ch.id]?.stars ?? 0;
       const label = isUnlocked
         ? `Ch${ch.id}  ${ch.name}  ·  power ${ch.recommendedPower}  ·  ${ch.modifier}`
         : `Ch${ch.id}  LOCKED — clear Ch${ch.id - 1} first`;
-      const color = isUnlocked ? '#e2e8f0' : '#475569';
+      const color = isUnlocked ? UiChrome.textCss : '#6b5344';
 
       const row = this.add
         .text(GameConfig.logicalWidth / 2, y, label, {
           fontFamily: Fonts.ui,
           fontSize: '16px',
           color,
+          backgroundColor: isUnlocked ? UiChrome.panelCss : undefined,
+          padding: isUnlocked ? { x: 20, y: 12 } : undefined,
         })
         .setOrigin(0.5)
         .setInteractive({ useHandCursor: isUnlocked });
@@ -65,12 +68,12 @@ export class ChapterSelectScene extends Phaser.Scene {
         this.add
           .text(
             GameConfig.logicalWidth / 2,
-            y + 22,
+            y + 28,
             `${'*'.repeat(stars)}${'.'.repeat(3 - stars)}  best ${formatTime(best[ch.id]?.seconds ?? 0)}`,
             {
               fontFamily: Fonts.ui,
               fontSize: '12px',
-              color: '#fbbf24',
+              color: UiChrome.accentCss,
             },
           )
           .setOrigin(0.5);
@@ -79,7 +82,7 @@ export class ChapterSelectScene extends Phaser.Scene {
           row.setColor('#f87171');
         });
         row.on('pointerout', () => {
-          row.setColor('#475569');
+          row.setColor('#6b5344');
         });
       }
 
@@ -95,7 +98,7 @@ export class ChapterSelectScene extends Phaser.Scene {
       .text(GameConfig.logicalWidth / 2, 660, '[ BACK ]', {
         fontFamily: Fonts.ui,
         fontSize: '20px',
-        color: '#94a3b8',
+        color: UiChrome.mutedCss,
       })
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true });

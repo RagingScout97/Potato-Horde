@@ -36,9 +36,9 @@ import { ComboPopup } from '@/ui/ComboPopup';
 import { PauseMenu } from '@/ui/PauseMenu';
 import {
   applyMuteToGame,
-  ColorblindSafe,
   scaledPx,
 } from '@/ui/settingsAccess';
+import { UiChrome } from '@/ui/chrome';
 import { juice } from '@/systems/JuiceController';
 import { eventBus, GameEvents } from '@/utils/EventBus';
 import { isDebugQuery } from '@/utils/math';
@@ -98,7 +98,10 @@ export class GameScene extends Phaser.Scene {
   private comboPopup!: ComboPopup;
   private alertToast!: Phaser.GameObjects.Text;
   private controlsHint!: Phaser.GameObjects.Text;
-  private hudPad = 12;
+  private hudPad = 16;
+  private hpPanel!: Phaser.GameObjects.Rectangle;
+  private hpBarBg!: Phaser.GameObjects.Rectangle;
+  private hpBarFg!: Phaser.GameObjects.Rectangle;
   private hpText!: Phaser.GameObjects.Text;
   private xpBarBg!: Phaser.GameObjects.Rectangle;
   private xpBarFg!: Phaser.GameObjects.Rectangle;
@@ -178,11 +181,14 @@ export class GameScene extends Phaser.Scene {
       const ch = getChapter(this.chapterId);
       this.chapterBossKind = ch.bossKind;
       this.endless.setMode('chapter');
-      this.arena.loadMap(this.chapterId, ch.mapSeed);
+      this.arena.loadMap(this.chapterId, ch.mapSeed, { animate: true });
       this.arena.enablePlayerCollision(this.player.body);
     } else {
       this.chapterId = null;
       this.endless.setMode('endless');
+      // Theme id 0 = Endless Starch (distinct from Ch1 Potato Fields)
+      this.arena.loadMap(0, 42042, { animate: true });
+      this.arena.enablePlayerCollision(this.player.body);
     }
     this.spawner = new SpawnerSystem(this, this.enemies, this.arena, {
       endless: pending.mode === 'endless',
@@ -217,8 +223,11 @@ export class GameScene extends Phaser.Scene {
     applyMuteToGame(this.game);
 
     const settings = loadSave().settings;
-    this.hudPad = settings.safeAreaPad ? 20 : 12;
+    this.hudPad = settings.safeAreaPad ? 28 : 18;
     const uiFs = (n: number) => scaledPx(n);
+    const hpBarW = 188;
+    const hpBarH = 14;
+    const xpBarW = 188;
 
     this.vignette = this.add
       .rectangle(
@@ -238,8 +247,8 @@ export class GameScene extends Phaser.Scene {
       .text(GameConfig.logicalWidth / 2, GameConfig.logicalHeight / 2, 'PAUSED', {
         fontFamily: Fonts.display,
         fontSize: uiFs(40),
-        color: '#fbbf24',
-        stroke: '#0f172a',
+        color: UiChrome.accentCss,
+        stroke: '#1a1410',
         strokeThickness: 6,
       })
       .setOrigin(0.5)
@@ -251,11 +260,11 @@ export class GameScene extends Phaser.Scene {
     this.comboPopup = new ComboPopup(this);
 
     this.alertToast = this.add
-      .text(GameConfig.logicalWidth / 2, 100, '', {
+      .text(GameConfig.logicalWidth / 2, 118, '', {
         fontFamily: Fonts.display,
         fontSize: uiFs(16),
-        color: ColorblindSafe.info,
-        stroke: '#0f172a',
+        color: UiChrome.accentCss,
+        stroke: '#1a1410',
         strokeThickness: 4,
       })
       .setOrigin(0.5)
@@ -264,11 +273,11 @@ export class GameScene extends Phaser.Scene {
       .setVisible(false);
 
     this.killBanner = this.add
-      .text(GameConfig.logicalWidth / 2, 72, '', {
+      .text(GameConfig.logicalWidth / 2, 88, '', {
         fontFamily: Fonts.display,
         fontSize: uiFs(20),
-        color: '#4ade80',
-        stroke: '#0f172a',
+        color: UiChrome.hpCss,
+        stroke: '#1a1410',
         strokeThickness: 4,
       })
       .setOrigin(0.5)
@@ -276,48 +285,71 @@ export class GameScene extends Phaser.Scene {
       .setDepth(2500)
       .setVisible(false);
 
-    // Persistent HUD core (T447 contrast stroke, T448 core only)
+    // Persistent HUD core — HP panel + bar + numeric always visible (T228 / T448)
+    const hpClusterY = this.hudPad + 8;
+    this.hpPanel = this.add
+      .rectangle(this.hudPad - 6, hpClusterY - 6, hpBarW + 28, 52, UiChrome.panel, 0.92)
+      .setOrigin(0, 0)
+      .setStrokeStyle(2, UiChrome.stroke, 1)
+      .setScrollFactor(0)
+      .setDepth(2499);
+
     this.hpText = this.add
-      .text(this.hudPad, 36, '', {
+      .text(this.hudPad, hpClusterY, 'HP 100/100', {
         fontFamily: Fonts.ui,
-        fontSize: uiFs(15),
-        color: ColorblindSafe.hp,
-        stroke: '#0f172a',
+        fontSize: uiFs(16),
+        color: UiChrome.hpCss,
+        stroke: '#1a1410',
         strokeThickness: 4,
       })
       .setScrollFactor(0)
       .setDepth(2500);
 
+    this.hpBarBg = this.add
+      .rectangle(this.hudPad, hpClusterY + 28, hpBarW, hpBarH, UiChrome.hpTrack)
+      .setOrigin(0, 0.5)
+      .setStrokeStyle(1, UiChrome.stroke, 0.8)
+      .setScrollFactor(0)
+      .setDepth(2500);
+    void this.hpPanel;
+    void this.hpBarBg;
+    this.hpBarFg = this.add
+      .rectangle(this.hudPad, hpClusterY + 28, hpBarW, hpBarH, UiChrome.hp)
+      .setOrigin(0, 0.5)
+      .setScrollFactor(0)
+      .setDepth(2501);
+
+    const xpY = hpClusterY + 64;
     this.levelText = this.add
-      .text(this.hudPad, 72, 'Lv 1', {
+      .text(this.hudPad, xpY, 'Lv 1', {
         fontFamily: Fonts.ui,
         fontSize: uiFs(14),
-        color: ColorblindSafe.xp,
-        stroke: '#0f172a',
+        color: UiChrome.xpCss,
+        stroke: '#1a1410',
         strokeThickness: 4,
       })
       .setScrollFactor(0)
       .setDepth(2500);
 
     this.xpBarBg = this.add
-      .rectangle(this.hudPad, 94, 160, 10, 0x0f172a)
+      .rectangle(this.hudPad, xpY + 22, xpBarW, 10, UiChrome.hpTrack)
       .setOrigin(0, 0.5)
-      .setStrokeStyle(1, 0xf8fafc, 0.35)
+      .setStrokeStyle(1, UiChrome.stroke, 0.55)
       .setScrollFactor(0)
       .setDepth(2500);
     void this.xpBarBg;
     this.xpBarFg = this.add
-      .rectangle(this.hudPad, 94, 0, 10, 0xeab308)
+      .rectangle(this.hudPad, xpY + 22, 0, 10, UiChrome.xp)
       .setOrigin(0, 0.5)
       .setScrollFactor(0)
       .setDepth(2501);
 
     this.enemyCountText = this.add
-      .text(this.hudPad, 110, '', {
+      .text(this.hudPad, xpY + 40, '', {
         fontFamily: Fonts.ui,
         fontSize: uiFs(12),
-        color: ColorblindSafe.muted,
-        stroke: '#0f172a',
+        color: UiChrome.mutedCss,
+        stroke: '#1a1410',
         strokeThickness: 3,
       })
       .setScrollFactor(0)
@@ -325,22 +357,22 @@ export class GameScene extends Phaser.Scene {
       .setVisible(!!settings.showDebugHud);
 
     this.evoText = this.add
-      .text(this.hudPad, 128, '', {
+      .text(this.hudPad, xpY + 58, '', {
         fontFamily: Fonts.ui,
         fontSize: uiFs(11),
-        color: '#f472b6',
-        stroke: '#0f172a',
+        color: '#e879a9',
+        stroke: '#1a1410',
         strokeThickness: 3,
       })
       .setScrollFactor(0)
       .setDepth(2500);
 
     this.timerText = this.add
-      .text(GameConfig.logicalWidth / 2, this.hudPad, '0:00', {
+      .text(GameConfig.logicalWidth / 2, this.hudPad + 4, '0:00', {
         fontFamily: Fonts.ui,
-        fontSize: uiFs(18),
-        color: '#e2e8f0',
-        stroke: '#0f172a',
+        fontSize: uiFs(20),
+        color: UiChrome.textCss,
+        stroke: '#1a1410',
         strokeThickness: 4,
       })
       .setOrigin(0.5, 0)
@@ -351,12 +383,12 @@ export class GameScene extends Phaser.Scene {
     this.controlsHint = this.add
       .text(
         this.hudPad,
-        GameConfig.logicalHeight - 28,
+        GameConfig.logicalHeight - 32,
         `${binds.up}${binds.left}${binds.down}${binds.right} · Auto · ${binds.pause} pause · Esc menu · T tutorial`,
         {
           fontFamily: Fonts.ui,
           fontSize: uiFs(11),
-          color: '#64748b',
+          color: UiChrome.mutedCss,
         },
       )
       .setScrollFactor(0)
@@ -580,7 +612,7 @@ export class GameScene extends Phaser.Scene {
       },
       forceAfk: () => this.endless.forceAfkNow(),
       loadMap: (chapterId: number, seed?: number) => {
-        this.arena.loadMap(chapterId, seed ?? 9001);
+        this.arena.loadMap(chapterId, seed ?? 9001, { animate: false });
         this.arena.enablePlayerCollision(this.player.body);
         return {
           chapterId: this.arena.getChapterId(),
@@ -769,6 +801,7 @@ export class GameScene extends Phaser.Scene {
       magnetBonus: this.runBuild.magnetBonus + (this.meta?.magnetBonus ?? 0),
     });
     this.arena.updateMinimap(this.player.x, this.player.y);
+    this.arena.updateAtmosphere(dt);
     this.fps.update(this.game.loop.actualFps);
     const runSec = this.spawner.getStats().runTimeSeconds;
     this.endless.update(
@@ -791,11 +824,15 @@ export class GameScene extends Phaser.Scene {
     const save = loadSave();
     const xp = this.xp.getState();
     const hpRatio = this.player.maxHp > 0 ? this.player.hp / this.player.maxHp : 1;
-    this.hpText.setColor(hpRatio < 0.35 ? ColorblindSafe.hpLow : ColorblindSafe.hp);
+    const hpColor = hpRatio < 0.35 ? UiChrome.hpLowCss : UiChrome.hpCss;
+    const hpFill = hpRatio < 0.35 ? UiChrome.hpLow : UiChrome.hp;
+    this.hpText.setColor(hpColor);
     this.hpText.setText(
       `HP ${Math.ceil(this.player.hp)}/${this.player.maxHp}` +
         (this.player.armor > 0 ? ` · AR ${this.player.armor}` : ''),
     );
+    this.hpBarFg.width = 188 * Math.min(1, Math.max(0, hpRatio));
+    this.hpBarFg.setFillStyle(hpFill, 1);
     // Low HP vignette (T230) — skip in performance mode
     this.vignette.setAlpha(
       save.settings.performanceMode ? 0 : hpRatio < 0.35 ? (0.35 - hpRatio) * 1.2 : 0,
@@ -803,7 +840,7 @@ export class GameScene extends Phaser.Scene {
 
     this.levelText.setText(`Lv ${xp.level}`);
     const ratio = xp.xpToLevel > 0 ? xp.xpIntoLevel / xp.xpToLevel : 0;
-    this.xpBarFg.width = 160 * Math.min(1, ratio);
+    this.xpBarFg.width = 188 * Math.min(1, ratio);
     const stats = this.spawner.getStats();
     // Contextual debug line (T448 / T458) — off by default
     const showDbg = !!save.settings.showDebugHud;
@@ -1188,6 +1225,7 @@ export class GameScene extends Phaser.Scene {
     this.combat.destroy();
     this.dummy.destroy();
     this.player.destroy();
+    this.arena.destroy();
   }
 }
 

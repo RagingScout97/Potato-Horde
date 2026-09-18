@@ -16,6 +16,7 @@ import {
 import { clampDelta } from '@/utils/math';
 import { aimVector, findNearestInRange, type TargetPoint } from '@/utils/targeting';
 import { loadSave } from '@/save/SaveManager';
+import { Fonts } from '@/ui/fonts';
 
 /**
  * Ally parachute drops + follow + auto-attack (T271–T294).
@@ -71,10 +72,12 @@ export class AllySystem {
     );
 
     this.hudText = scene.add
-      .text(12, 146, '', {
-        fontFamily: 'monospace',
+      .text(18, 168, '', {
+        fontFamily: Fonts.ui,
         fontSize: '12px',
-        color: '#38bdf8',
+        color: '#7dd3a0',
+        stroke: '#1a1410',
+        strokeThickness: 3,
       })
       .setScrollFactor(0)
       .setDepth(2500);

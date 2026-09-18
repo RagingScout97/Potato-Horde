@@ -2,6 +2,13 @@
 
 Human-oriented summary of shipped work through **Gate 11** (Phases 0–11). Later phases may already exist partially in `src/` while this list stays at the last closed gate.
 
+## UI polish — HUD / themes / palette (2026-09-19)
+
+- Combat HUD: player **HP bar + numeric** on dirt panel (always visible); spacing for XP/timer/minimap
+- Stage themes: Endless Starch + Chapters 1–5 (ground/grid/haze/dust); crossfade on chapter change; perf mode skips dust
+- UI chrome shifted off slate-blue → warm potato dirt / amber (`src/ui/chrome.ts`, `global.css`); entity box colors unchanged
+- Draft / pause / hub / menu spacing + warmer panel colors
+
 ## Phase 0 — GDD
 
 - Design docs: GDD, palette, names, formulas, save schema, non-goals

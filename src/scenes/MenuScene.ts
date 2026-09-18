@@ -9,6 +9,7 @@ import { setPendingRun } from '@/systems/RunMode';
 import type { DifficultyPreset } from '@/utils/endlessScale';
 import { hookCopy, getDailyBoard, setSessionGoal } from '@/systems/Retention';
 import { applyMuteToGame } from '@/ui/settingsAccess';
+import { UiChrome } from '@/ui/chrome';
 
 export class MenuScene extends Phaser.Scene {
   private started = false;
@@ -19,7 +20,7 @@ export class MenuScene extends Phaser.Scene {
 
   create(): void {
     this.started = false;
-    this.cameras.main.setBackgroundColor('#0b0f1a');
+    this.cameras.main.setBackgroundColor(UiChrome.bgDeepCss);
     this.cameras.main.fadeIn(280, 0, 0, 0);
     applyMuteToGame(this.game);
 
@@ -29,30 +30,37 @@ export class MenuScene extends Phaser.Scene {
     setSessionGoal('Clear a draft pick or beat daily best');
 
     const title = this.add
-      .text(this.scale.width / 2, this.scale.height * 0.18, 'POTATO HORDE', {
+      .text(this.scale.width / 2, this.scale.height * 0.16, 'POTATO HORDE', {
         fontFamily: Fonts.display,
         fontSize: '56px',
-        color: '#fbbf24',
+        color: UiChrome.accentCss,
+        stroke: '#1a1410',
+        strokeThickness: 6,
       })
       .setOrigin(0.5)
       .setAlpha(0);
 
     this.add
-      .text(this.scale.width / 2, this.scale.height * 0.28, hook, {
+      .text(this.scale.width / 2, this.scale.height * 0.26, hook, {
         fontFamily: Fonts.ui,
         fontSize: '15px',
-        color: '#cbd5e1',
+        color: UiChrome.textCss,
         align: 'center',
         wordWrap: { width: 560 },
       })
       .setOrigin(0.5);
 
     this.add
-      .text(this.scale.width / 2, this.scale.height * 0.34, 'Survivors · colored boxes · single-player', {
-        fontFamily: Fonts.ui,
-        fontSize: '14px',
-        color: '#94a3b8',
-      })
+      .text(
+        this.scale.width / 2,
+        this.scale.height * 0.32,
+        'Survivors · colored boxes · single-player',
+        {
+          fontFamily: Fonts.ui,
+          fontSize: '14px',
+          color: UiChrome.mutedCss,
+        },
+      )
       .setOrigin(0.5);
 
     const pbSec = save.stats.bestEndlessSeconds;
@@ -62,32 +70,32 @@ export class MenuScene extends Phaser.Scene {
         ? `Endless PB  ${formatPb(pbSec)}  ·  ${pbKills} kills  ·  ${save.meta.difficulty}`
         : `Endless · ${save.meta.difficulty}`;
     this.add
-      .text(this.scale.width / 2, this.scale.height * 0.4, pbLine, {
+      .text(this.scale.width / 2, this.scale.height * 0.38, pbLine, {
         fontFamily: Fonts.ui,
         fontSize: '13px',
-        color: '#64748b',
+        color: UiChrome.mutedCss,
       })
       .setOrigin(0.5);
 
     this.add
       .text(
         this.scale.width / 2,
-        this.scale.height * 0.45,
+        this.scale.height * 0.43,
         `Daily ${daily.day}  ·  seed ${daily.seed}  ·  best ${daily.bestKills} kills / ${formatPb(daily.bestSeconds)}`,
         {
           fontFamily: Fonts.ui,
           fontSize: '12px',
-          color: '#38bdf8',
+          color: UiChrome.accentCss,
         },
       )
       .setOrigin(0.5);
 
     if (!isTutorialCompleted()) {
       this.add
-        .text(this.scale.width / 2, this.scale.height * 0.52, FIRST_RUN_BRIEFING, {
+        .text(this.scale.width / 2, this.scale.height * 0.5, FIRST_RUN_BRIEFING, {
           fontFamily: Fonts.ui,
           fontSize: '14px',
-          color: '#e2e8f0',
+          color: UiChrome.textCss,
           align: 'center',
           wordWrap: { width: 520 },
         })
@@ -95,12 +103,12 @@ export class MenuScene extends Phaser.Scene {
     }
 
     const start = this.add
-      .text(this.scale.width / 2, this.scale.height * 0.62, 'ENDLESS', {
+      .text(this.scale.width / 2, this.scale.height * 0.6, 'ENDLESS', {
         fontFamily: Fonts.display,
         fontSize: '28px',
-        color: '#4ade80',
-        backgroundColor: '#1e293b',
-        padding: { x: 24, y: 12 },
+        color: UiChrome.hpCss,
+        backgroundColor: UiChrome.panelCss,
+        padding: { x: 28, y: 14 },
       })
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true });
@@ -109,20 +117,20 @@ export class MenuScene extends Phaser.Scene {
       .text(this.scale.width / 2, this.scale.height * 0.7, 'CHAPTERS', {
         fontFamily: Fonts.display,
         fontSize: '24px',
-        color: '#38bdf8',
-        backgroundColor: '#1e293b',
-        padding: { x: 20, y: 10 },
+        color: '#e8c070',
+        backgroundColor: UiChrome.panelCss,
+        padding: { x: 24, y: 12 },
       })
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true });
 
     const hubBtn = this.add
-      .text(this.scale.width / 2, this.scale.height * 0.78, 'HUB', {
+      .text(this.scale.width / 2, this.scale.height * 0.79, 'HUB', {
         fontFamily: Fonts.display,
         fontSize: '22px',
-        color: '#c084fc',
-        backgroundColor: '#1e293b',
-        padding: { x: 20, y: 10 },
+        color: '#e8a060',
+        backgroundColor: UiChrome.panelCss,
+        padding: { x: 24, y: 12 },
       })
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true });
@@ -132,24 +140,29 @@ export class MenuScene extends Phaser.Scene {
     attachButtonFeedback(this, hubBtn);
 
     this.add
-      .text(this.scale.width / 2, this.scale.height * 0.88, '[D] difficulty  ·  [C] chapters  ·  [H] hub', {
-        fontFamily: Fonts.ui,
-        fontSize: '12px',
-        color: '#475569',
-      })
+      .text(
+        this.scale.width / 2,
+        this.scale.height * 0.9,
+        '[D] difficulty  ·  [C] chapters  ·  [H] hub',
+        {
+          fontFamily: Fonts.ui,
+          fontSize: '12px',
+          color: UiChrome.mutedCss,
+        },
+      )
       .setOrigin(0.5);
 
     this.tweens.add({
       targets: title,
       alpha: 1,
-      y: this.scale.height * 0.2,
+      y: this.scale.height * 0.18,
       duration: 400,
       ease: 'Back.easeOut',
     });
 
     this.tweens.add({
       targets: start,
-      alpha: 0.4,
+      alpha: 0.55,
       yoyo: true,
       repeat: -1,
       duration: 700,

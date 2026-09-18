@@ -33,6 +33,7 @@ import {
 } from '@/systems/HeroProgress';
 import { Fonts } from '@/ui/fonts';
 import { attachButtonFeedback } from '@/ui/buttonFeedback';
+import { UiChrome } from '@/ui/chrome';
 import { fadeToScene } from '@/utils/sceneFade';
 import { isDebugQuery } from '@/utils/math';
 import { setPendingRun } from '@/systems/RunMode';
@@ -70,7 +71,7 @@ export class HubScene extends Phaser.Scene {
   }
 
   create(): void {
-    this.cameras.main.setBackgroundColor('#0b0f1a');
+    this.cameras.main.setBackgroundColor(UiChrome.bgDeepCss);
     this.cameras.main.fadeIn(200, 0, 0, 0);
     const newly = syncHeroUnlocks();
     claimDailyLogin(); // idempotent
@@ -114,7 +115,7 @@ export class HubScene extends Phaser.Scene {
         {
           fontFamily: Fonts.display,
           fontSize: '22px',
-          color: '#fbbf24',
+          color: UiChrome.accentCss,
         },
       )
       .setOrigin(0.5);
@@ -174,13 +175,13 @@ export class HubScene extends Phaser.Scene {
         fontFamily: Fonts.display,
         fontSize: '22px',
         color,
-        backgroundColor: '#1e293b',
-        padding: { x: 20, y: 12 },
+        backgroundColor: UiChrome.panelCss,
+        padding: { x: 22, y: 14 },
       })
       .setOrigin(0.5);
     // Large hit targets (T452) — min ~48px tall
     t.setInteractive(
-      new Phaser.Geom.Rectangle(-200, -28, 400, 56),
+      new Phaser.Geom.Rectangle(-200, -30, 400, 60),
       Phaser.Geom.Rectangle.Contains,
     );
     if (t.input) t.input.cursor = 'pointer';
@@ -197,7 +198,7 @@ export class HubScene extends Phaser.Scene {
         .text(cx, 90, `Loadout power ${power}  ·  Hero ${loadSave().meta.equippedHeroId}`, {
           fontFamily: Fonts.ui,
           fontSize: '14px',
-          color: '#94a3b8',
+          color: UiChrome.mutedCss,
         })
         .setOrigin(0.5),
     );
@@ -205,22 +206,22 @@ export class HubScene extends Phaser.Scene {
     const rows: Array<[string, string, () => void]> = [
       [
         'PLAY ENDLESS',
-        '#4ade80',
+        UiChrome.hpCss,
         () => {
           setPendingRun({ mode: 'endless' });
           fadeToScene(this, 'Game', 180);
         },
       ],
-      ['CHAPTERS', '#38bdf8', () => fadeToScene(this, 'ChapterSelect', 180)],
-      ['DAILY CHALLENGE', '#22d3ee', () => this.setView('daily')],
-      ['ACHIEVEMENTS', '#fbbf24', () => this.setView('achievements')],
-      ['UPGRADES', '#fbbf24', () => this.setView('upgrades')],
-      ['GEAR', '#c084fc', () => this.setView('gear')],
+      ['CHAPTERS', '#e8c070', () => fadeToScene(this, 'ChapterSelect', 180)],
+      ['DAILY CHALLENGE', '#d4a574', () => this.setView('daily')],
+      ['ACHIEVEMENTS', UiChrome.accentCss, () => this.setView('achievements')],
+      ['UPGRADES', UiChrome.accentCss, () => this.setView('upgrades')],
+      ['GEAR', '#e879a9', () => this.setView('gear')],
       ['HEROES', '#f97316', () => this.setView('heroes')],
-      ['SETTINGS', '#94a3b8', () => this.setView('settings')],
+      ['SETTINGS', UiChrome.mutedCss, () => this.setView('settings')],
     ];
     rows.forEach(([label, color, fn], i) => {
-      this.navBtn(cx, 140 + i * 48, label, color, fn);
+      this.navBtn(cx, 132 + i * 56, label, color, fn);
     });
 
     const pity = getPityDamageMult();
@@ -247,7 +248,7 @@ export class HubScene extends Phaser.Scene {
         .text(cx, 80, 'DAILY CHALLENGE', {
           fontFamily: Fonts.display,
           fontSize: '24px',
-          color: '#22d3ee',
+          color: '#d4a574',
         })
         .setOrigin(0.5),
     );
@@ -266,13 +267,13 @@ export class HubScene extends Phaser.Scene {
         )
         .setOrigin(0.5, 0),
     );
-    this.navBtn(cx, 420, 'PLAY DAILY (seeded endless)', '#22d3ee', () => {
+    this.navBtn(cx, 420, 'PLAY DAILY (seeded endless)', '#d4a574', () => {
       unlockAchievement('daily_try');
       void createDailyRng(); // seed reserved for future draft RNG wiring
       setPendingRun({ mode: 'endless' });
       fadeToScene(this, 'Game', 180);
     });
-    this.navBtn(cx, 660, '[ BACK ]', '#94a3b8', () => this.setView('home'));
+    this.navBtn(cx, 660, '[ BACK ]', UiChrome.mutedCss, () => this.setView('home'));
   }
 
   private drawAchievements(): void {
@@ -303,7 +304,7 @@ export class HubScene extends Phaser.Scene {
           .setOrigin(0.5),
       );
     });
-    this.navBtn(cx, 660, '[ BACK ]', '#94a3b8', () => this.setView('home'));
+    this.navBtn(cx, 660, '[ BACK ]', UiChrome.mutedCss, () => this.setView('home'));
   }
 
   private setView(v: HubView): void {
@@ -373,7 +374,7 @@ export class HubScene extends Phaser.Scene {
       });
     }
 
-    this.navBtn(GameConfig.logicalWidth / 2, 640, '[ BACK ]', '#94a3b8', () =>
+    this.navBtn(GameConfig.logicalWidth / 2, 640, '[ BACK ]', UiChrome.mutedCss, () =>
       this.setView('home'),
     );
   }
@@ -456,7 +457,7 @@ export class HubScene extends Phaser.Scene {
       );
     }
 
-    this.navBtn(GameConfig.logicalWidth / 2, 660, '[ BACK ]', '#94a3b8', () =>
+    this.navBtn(GameConfig.logicalWidth / 2, 660, '[ BACK ]', UiChrome.mutedCss, () =>
       this.setView('home'),
     );
   }
@@ -564,7 +565,7 @@ export class HubScene extends Phaser.Scene {
       }
     });
 
-    this.navBtn(GameConfig.logicalWidth / 2, 660, '[ BACK ]', '#94a3b8', () =>
+    this.navBtn(GameConfig.logicalWidth / 2, 660, '[ BACK ]', UiChrome.mutedCss, () =>
       this.setView('home'),
     );
   }
@@ -690,12 +691,12 @@ export class HubScene extends Phaser.Scene {
         GameConfig.logicalWidth / 2 + (col === 0 ? -280 : 280),
         130 + row * 44,
         label,
-        '#94a3b8',
+        UiChrome.mutedCss,
         fn,
       );
     });
 
-    this.navBtn(GameConfig.logicalWidth / 2, 460, 'Export save (copy JSON)', '#38bdf8', () => {
+    this.navBtn(GameConfig.logicalWidth / 2, 460, 'Export save (copy JSON)', '#e8c070', () => {
       const json = exportSaveJson();
       void navigator.clipboard?.writeText(json).catch(() => undefined);
       window.prompt('Save JSON (copy):', json);
@@ -703,7 +704,7 @@ export class HubScene extends Phaser.Scene {
       this.rebuild();
     });
 
-    this.navBtn(GameConfig.logicalWidth / 2, 510, 'Import save JSON', '#38bdf8', () => {
+    this.navBtn(GameConfig.logicalWidth / 2, 510, 'Import save JSON', '#e8c070', () => {
       const raw = window.prompt('Paste save JSON:');
       if (!raw) return;
       const r = importSaveJson(raw);
@@ -724,7 +725,7 @@ export class HubScene extends Phaser.Scene {
       this.rebuild();
     });
 
-    this.navBtn(GameConfig.logicalWidth / 2, 660, '[ BACK ]', '#94a3b8', () =>
+    this.navBtn(GameConfig.logicalWidth / 2, 660, '[ BACK ]', UiChrome.mutedCss, () =>
       this.setView('home'),
     );
   }

@@ -388,19 +388,19 @@ export class BossSystem implements DamageableTarget {
   private ensureHud(): void {
     if (!this.hpBarBg) {
       this.hpBarBg = this.scene.add
-        .rectangle(GameConfig.logicalWidth / 2, 48, 360, 14, 0x1e293b)
+        .rectangle(GameConfig.logicalWidth / 2, 56, 360, 14, 0x2a2118)
         .setScrollFactor(0)
         .setDepth(2600);
       this.hpBarFg = this.scene.add
-        .rectangle(GameConfig.logicalWidth / 2 - 180, 48, 360, 14, 0xef4444)
+        .rectangle(GameConfig.logicalWidth / 2 - 180, 56, 360, 14, 0xa855f7)
         .setOrigin(0, 0.5)
         .setScrollFactor(0)
         .setDepth(2601);
       this.nameText = this.scene.add
-        .text(GameConfig.logicalWidth / 2, 28, '', {
+        .text(GameConfig.logicalWidth / 2, 34, '', {
           fontFamily: 'monospace',
           fontSize: '16px',
-          color: '#fca5a5',
+          color: '#e9d5ff',
         })
         .setOrigin(0.5)
         .setScrollFactor(0)

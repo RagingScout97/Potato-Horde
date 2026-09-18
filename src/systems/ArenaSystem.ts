@@ -14,6 +14,7 @@ import {
   unstickFromAabb,
 } from '@/utils/mapLayout';
 import { eventBus, GameEvents } from '@/utils/EventBus';
+import { loadSave } from '@/save/SaveManager';
 
 export interface ObstacleMeta {
   kind: ObstacleKind;
@@ -25,13 +26,24 @@ export interface ObstacleMeta {
 
 type ObstacleRect = Phaser.GameObjects.Rectangle & { obstacleMeta?: ObstacleMeta };
 
+type DustParticle = {
+  gfx: Phaser.GameObjects.Arc;
+  vx: number;
+  vy: number;
+  life: number;
+};
+
+const DUST_CAP = 18;
+
 /**
- * Arena ground + obstacles / map (Phase 2 + Phase 13).
+ * Arena ground + obstacles / map (Phase 2 + Phase 13) + themed atmosphere.
  */
 export class ArenaSystem {
   readonly bounds: Phaser.Geom.Rectangle;
   private grid!: Phaser.GameObjects.Graphics;
+  private haze!: Phaser.GameObjects.Rectangle;
   private vignette!: Phaser.GameObjects.Graphics;
+  private fadeOverlay!: Phaser.GameObjects.Rectangle;
   private spawnMarker!: Phaser.GameObjects.Arc;
   private safeZone!: Phaser.GameObjects.Arc;
   private minimap!: Phaser.GameObjects.Graphics;
@@ -42,6 +54,9 @@ export class ArenaSystem {
   private chapterId = 1;
   private layoutSeed = 9001;
   private playerCollider: Phaser.Physics.Arcade.Collider | null = null;
+  private dust: DustParticle[] = [];
+  private pulseTween: Phaser.Tweens.Tween | null = null;
+  private hazeBaseAlpha = 0.045;
 
   private readonly scene: Phaser.Scene;
 
@@ -52,7 +67,21 @@ export class ArenaSystem {
     scene.physics.world.setBounds(0, 0, width, height);
     scene.cameras.main.setBounds(0, 0, width, height);
 
+    this.grid = scene.add.graphics().setDepth(0);
     this.drawGrid();
+
+    this.haze = scene.add
+      .rectangle(
+        GameConfig.logicalWidth / 2,
+        GameConfig.logicalHeight / 2,
+        GameConfig.logicalWidth,
+        GameConfig.logicalHeight,
+        this.theme.haze,
+        this.hazeBaseAlpha,
+      )
+      .setScrollFactor(0)
+      .setDepth(900);
+
     this.spawnMarker = scene.add.circle(centerX, centerY, 18, 0xfbbf24, 0.35);
     this.spawnMarker.setStrokeStyle(2, 0xfbbf24);
     this.spawnMarker.setDepth(1);
@@ -66,6 +95,19 @@ export class ArenaSystem {
     this.vignette.setDepth(1000);
     this.drawVignette();
 
+    this.fadeOverlay = scene.add
+      .rectangle(
+        GameConfig.logicalWidth / 2,
+        GameConfig.logicalHeight / 2,
+        GameConfig.logicalWidth,
+        GameConfig.logicalHeight,
+        0x000000,
+        0,
+      )
+      .setScrollFactor(0)
+      .setDepth(950)
+      .setVisible(false);
+
     this.minimap = scene.add.graphics();
     this.minimap.setScrollFactor(0);
     this.minimap.setDepth(1001);
@@ -75,30 +117,67 @@ export class ArenaSystem {
     scene.physics.add.existing(this.collisionLayer, true);
 
     // Default endless layout (T314 — chapter data hook)
-    this.loadMap(1, 9001);
+    this.loadMap(0, 9001, { animate: false });
 
     scene.scale.on('resize', () => this.drawVignette());
   }
 
   /** Load chapter-themed seeded layout (T302, T305–T306, T314). */
-  loadMap(chapterId: number, seed = 9001): void {
+  loadMap(chapterId: number, seed = 9001, opts?: { animate?: boolean }): void {
+    const animate = opts?.animate !== false;
+    const prevTheme = this.theme;
     this.chapterId = chapterId;
     this.layoutSeed = seed;
     this.theme = getChapterTheme(chapterId);
-    this.clearObstacles();
-    this.drawGrid();
 
-    const stamps = generateMapStamps({
-      arenaW: this.bounds.width,
-      arenaH: this.bounds.height,
-      centerX: GameConfig.arena.centerX,
-      centerY: GameConfig.arena.centerY,
-      seed,
-      chapterId,
-    });
-    for (const stamp of stamps) this.placeStamp(stamp);
+    const applyTheme = (): void => {
+      this.clearObstacles();
+      this.drawGrid();
+      this.applyAtmosphere();
+      this.rebuildDust();
 
-    this.updateMinimap(GameConfig.arena.centerX, GameConfig.arena.centerY);
+      const stamps = generateMapStamps({
+        arenaW: this.bounds.width,
+        arenaH: this.bounds.height,
+        centerX: GameConfig.arena.centerX,
+        centerY: GameConfig.arena.centerY,
+        seed,
+        chapterId: Math.max(1, chapterId),
+      });
+      for (const stamp of stamps) this.placeStamp(stamp);
+
+      this.updateMinimap(GameConfig.arena.centerX, GameConfig.arena.centerY);
+      this.scene.cameras.main.setBackgroundColor(this.theme.camBg);
+    };
+
+    if (animate && prevTheme.id !== this.theme.id) {
+      this.scene.tweens.killTweensOf(this.fadeOverlay);
+      this.fadeOverlay.setFillStyle(prevTheme.camBg, 1);
+      this.fadeOverlay.setVisible(true).setAlpha(0);
+      this.scene.tweens.add({
+        targets: this.fadeOverlay,
+        alpha: 0.72,
+        duration: 160,
+        ease: 'Quad.easeIn',
+        onComplete: () => {
+          applyTheme();
+          this.scene.tweens.add({
+            targets: this.fadeOverlay,
+            alpha: 0,
+            duration: 280,
+            ease: 'Quad.easeOut',
+            onComplete: () => {
+              this.fadeOverlay.setVisible(false);
+              this.fadeOverlay.setAlpha(0);
+            },
+          });
+        },
+      });
+    } else {
+      this.scene.tweens.killTweensOf(this.fadeOverlay);
+      this.fadeOverlay.setVisible(false).setAlpha(0);
+      applyTheme();
+    }
   }
 
   getChapterId(): number {
@@ -111,6 +190,33 @@ export class ArenaSystem {
 
   getTheme(): ChapterTheme {
     return this.theme;
+  }
+
+  /** Soft dust drift + haze pulse (skipped in performance mode). */
+  updateAtmosphere(delta: number): void {
+    let perf = false;
+    try {
+      perf = !!loadSave().settings.performanceMode;
+    } catch {
+      /* ignore */
+    }
+    if (perf) {
+      for (const d of this.dust) d.gfx.setVisible(false);
+      this.haze.setAlpha(this.hazeBaseAlpha * 0.5);
+      return;
+    }
+
+    const dt = Math.min(delta, 50) / 1000;
+    const w = this.bounds.width;
+    const h = this.bounds.height;
+    for (const d of this.dust) {
+      d.gfx.x += d.vx * dt;
+      d.gfx.y += d.vy * dt;
+      d.life -= dt;
+      if (d.life <= 0 || d.gfx.x < 0 || d.gfx.y < 0 || d.gfx.x > w || d.gfx.y > h) {
+        this.respawnDust(d);
+      }
+    }
   }
 
   /** First 3s safe zone visual; fades out. */
@@ -233,12 +339,12 @@ export class ArenaSystem {
   updateMinimap(playerX: number, playerY: number): void {
     const g = this.minimap;
     g.clear();
-    const ox = GameConfig.logicalWidth - 110;
-    const oy = 20;
-    const s = 90;
-    g.fillStyle(0x0b0f1a, 0.7);
+    const ox = GameConfig.logicalWidth - 118;
+    const oy = 16;
+    const s = 96;
+    g.fillStyle(0x1a1410, 0.78);
     g.fillRect(ox, oy, s, s);
-    g.lineStyle(1, 0x64748b, 1);
+    g.lineStyle(1, 0x6b5344, 1);
     g.strokeRect(ox, oy, s, s);
 
     for (const obj of this.obstacleGroup.getChildren()) {
@@ -256,6 +362,21 @@ export class ArenaSystem {
     const py = oy + (playerY / this.bounds.height) * s;
     g.fillStyle(0x4ade80, 1);
     g.fillCircle(px, py, 3);
+  }
+
+  destroy(): void {
+    this.pulseTween?.stop();
+    this.pulseTween = null;
+    for (const d of this.dust) d.gfx.destroy();
+    this.dust = [];
+    this.haze?.destroy();
+    this.fadeOverlay?.destroy();
+    this.vignette?.destroy();
+    this.grid?.destroy();
+    this.minimap?.destroy();
+    this.spawnMarker?.destroy();
+    this.safeZone?.destroy();
+    this.clearObstacles();
   }
 
   private placeStamp(stamp: ObstacleStamp): void {
@@ -294,13 +415,11 @@ export class ArenaSystem {
   }
 
   private drawGrid(): void {
-    if (this.grid) this.grid.destroy();
-    this.grid = this.scene.add.graphics();
-    this.grid.setDepth(0);
+    this.grid.clear();
     const { width, height, gridSize } = GameConfig.arena;
     this.grid.fillStyle(this.theme.ground, 1);
     this.grid.fillRect(0, 0, width, height);
-    this.grid.lineStyle(1, this.theme.grid, 1);
+    this.grid.lineStyle(1, this.theme.grid, 0.85);
     for (let x = 0; x <= width; x += gridSize) {
       this.grid.lineBetween(x, 0, x, height);
     }
@@ -309,16 +428,66 @@ export class ArenaSystem {
     }
   }
 
+  private applyAtmosphere(): void {
+    this.haze.setFillStyle(this.theme.haze, this.hazeBaseAlpha);
+    this.haze.setAlpha(this.hazeBaseAlpha);
+    this.pulseTween?.stop();
+    this.pulseTween = this.scene.tweens.add({
+      targets: this.haze,
+      alpha: this.hazeBaseAlpha * 1.35,
+      duration: 4800,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut',
+    });
+  }
+
+  private rebuildDust(): void {
+    for (const d of this.dust) d.gfx.destroy();
+    this.dust = [];
+    let perf = false;
+    try {
+      perf = !!loadSave().settings.performanceMode;
+    } catch {
+      /* ignore */
+    }
+    if (perf) return;
+
+    for (let i = 0; i < DUST_CAP; i++) {
+      const gfx = this.scene.add
+        .circle(0, 0, 2 + (i % 3), this.theme.particle, 0.22 + (i % 4) * 0.04)
+        .setDepth(0.5);
+      const d: DustParticle = { gfx, vx: 0, vy: 0, life: 1 };
+      this.respawnDust(d, true);
+      this.dust.push(d);
+    }
+  }
+
+  private respawnDust(d: DustParticle, initial = false): void {
+    const w = this.bounds.width;
+    const h = this.bounds.height;
+    d.gfx.setPosition(
+      Phaser.Math.Between(80, w - 80),
+      Phaser.Math.Between(80, h - 80),
+    );
+    d.gfx.setFillStyle(this.theme.particle, 0.2 + Math.random() * 0.15);
+    d.vx = Phaser.Math.FloatBetween(-18, 18);
+    d.vy = Phaser.Math.FloatBetween(-12, 12);
+    d.life = initial ? Phaser.Math.FloatBetween(2, 10) : Phaser.Math.FloatBetween(6, 14);
+    d.gfx.setVisible(true);
+  }
+
   private drawVignette(): void {
     const g = this.vignette;
     g.clear();
-    const w = this.scene.scale.width;
-    const h = this.scene.scale.height;
-    g.fillStyle(0x000000, 0.35);
-    g.fillRect(0, 0, w, 28);
-    g.fillRect(0, h - 28, w, 28);
-    g.fillRect(0, 0, 28, h);
-    g.fillRect(w - 28, 0, 28, h);
+    const w = GameConfig.logicalWidth;
+    const h = GameConfig.logicalHeight;
+    const edge = 36;
+    g.fillStyle(0x000000, 0.4);
+    g.fillRect(0, 0, w, edge);
+    g.fillRect(0, h - edge, w, edge);
+    g.fillRect(0, 0, edge, h);
+    g.fillRect(w - edge, 0, edge, h);
   }
 }
 

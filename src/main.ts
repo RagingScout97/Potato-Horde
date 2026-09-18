@@ -11,7 +11,7 @@ import { ResultScene } from '@/scenes/ResultScene';
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   parent: 'game',
-  backgroundColor: '#0b0f1a',
+  backgroundColor: '#1a1410',
   width: GameConfig.logicalWidth,
   height: GameConfig.logicalHeight,
   scale: {

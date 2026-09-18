@@ -135,6 +135,8 @@ Skill ids match `src/data/skills.ts` (e.g. `dual_pistol`, `shotgun`, `boomerang`
 | Pause | **P** — movement, spawner, cooldowns freeze (**S04**) |
 | Combat | Stand near red dummy / spawn with **1** — auto-fire damages (**S05**) |
 | Draft | **X** until level-up → pick card → combat resumes (**S07**) |
+| HUD HP | In Game: top-left **HP bar + `HP n/max`** always visible (dirt panel) |
+| Stage theme | Endless = *Endless Starch*; Chapters 1–5 swap ground/grid/haze (`__TEST__.getMap().theme`) |
 | Story / tutorial | Clear `storyIntroSeen` + `tutorialCompleted` → reload → Intro → skip → Menu briefing → Game tips → **T**/Esc skip; second load → Menu only |
 | Boss | **B** or `__TEST__.forceBoss('spitter')` (**S05**/boss path) |
 | Death | `__TEST__.killPlayer()` → Result → Retry (**S08**) |
