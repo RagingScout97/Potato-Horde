@@ -319,6 +319,7 @@ export class CombatSystem {
   }
 
   private flashMuzzle(x: number, y: number, dirX: number, dirY: number): void {
+    if (loadSave().settings.performanceMode) return;
     const ox = x + dirX * 22;
     const oy = y + dirY * 22;
     if (!this.muzzleFlash) {

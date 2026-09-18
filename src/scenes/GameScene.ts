@@ -62,10 +62,9 @@ import {
   unlockAchievement,
   milestoneTitle,
   trackEvent,
-  setSessionGoal,
   getSessionGoal,
 } from '@/systems/Retention';
-import { logGlitch, isFarOffscreen } from '@/utils/harden';
+import { logGlitch } from '@/utils/harden';
 
 export class GameScene extends Phaser.Scene {
   private player!: Player;
@@ -641,6 +640,19 @@ export class GameScene extends Phaser.Scene {
         this.setPaused(true);
         return this.pauseMenu.isOpen();
       },
+      poolAudit: () => ({
+        enemies: this.enemies.pool.getActiveCount(),
+        bullets: this.combat.getActiveBulletCount(),
+        orbs: this.xp.orbs.getActiveCount(),
+      }),
+      stressFodder: (n = 500) => {
+        this.enemies.spawnRing(Math.min(500, n), 'melee', this.player.x, this.player.y, 400);
+        return this.enemies.pool.getActiveCount();
+      },
+      reloadSceneN: (n = 1) => {
+        for (let i = 0; i < n; i++) this.scene.restart();
+        return n;
+      },
       isTutorialActive: () => this.tutorial?.isActive() ?? false,
       skipTutorial: () => {
         setTutorialCompleted(true);
@@ -717,6 +729,7 @@ export class GameScene extends Phaser.Scene {
 
     // NaN guard (T466)
     if (!Number.isFinite(this.player.x) || !Number.isFinite(this.player.y)) {
+      logGlitch('nan_player_pos', 'reset to center', 'P1');
       this.player.body.setPosition(GameConfig.arena.centerX, GameConfig.arena.centerY);
     }
 

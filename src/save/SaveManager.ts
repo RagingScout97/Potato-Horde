@@ -149,3 +149,20 @@ export function resetSave(): SaveV1 {
   writeSave(fresh);
   return fresh;
 }
+
+/** Corrupt / unreadable save recovery (T478). */
+export function recoverCorruptSave(): SaveV1 {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) return resetSave();
+    JSON.parse(raw);
+    return loadSave();
+  } catch {
+    try {
+      localStorage.setItem(`${SAVE_KEY}.corrupt.bak`, localStorage.getItem(SAVE_KEY) ?? '');
+    } catch {
+      /* ignore */
+    }
+    return resetSave();
+  }
+}

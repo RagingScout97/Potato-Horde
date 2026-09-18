@@ -9,6 +9,8 @@ import { canContactDamage } from '@/utils/combatMath';
 import { clampDelta } from '@/utils/math';
 import { aimVector } from '@/utils/targeting';
 import { eventBus, GameEvents } from '@/utils/EventBus';
+import { isFarOffscreen, isFinitePos, sanitizePos } from '@/utils/harden';
+import { loadSave } from '@/save/SaveManager';
 
 /**
  * Enemy AI: chase, separation, ranged fire, contact DPS (Phase 5).
@@ -84,9 +86,20 @@ export class EnemySystem {
     this.nowMs = time;
 
     const actives = this.pool.getActive();
+    const perf = loadSave().settings.performanceMode;
     // Separation + chase
     for (const e of actives) {
       if (!e.alive) continue;
+      if (!isFinitePos(e.x, e.y)) {
+        const p = sanitizePos(e.x, e.y, player.x, player.y);
+        e.body.setPosition(p.x, p.y);
+      }
+      // Offscreen cull AI cost (T462) — still move toward player simply
+      if (perf && isFarOffscreen(e.x, e.y, player.x, player.y, 1100)) {
+        const ang = Math.atan2(player.y - e.y, player.x - e.x);
+        this.applyVelocity(e, Math.cos(ang) * e.def.speed, Math.sin(ang) * e.def.speed);
+        continue;
+      }
       this.tickBurn(e, dt);
       if (time < e.status.stunUntil) {
         this.applyVelocity(e, 0, 0);

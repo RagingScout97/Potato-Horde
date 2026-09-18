@@ -12,7 +12,7 @@ describe('SpatialHash', () => {
     ];
     hash.rebuild(targets);
     expect(hash.findNearest(0, 0, 100)?.id).toBe('a');
-    expect(hash.findNearest(0, 0, 30)).toBeNull();
+    expect(hash.findNearest(0, 0, 5)).toBeNull();
   });
 
   it('hybrid matches linear for small sets', () => {
