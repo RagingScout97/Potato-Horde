@@ -1,0 +1,203 @@
+{
+  "source": "public/art/raw/ui-chrome-kit.png",
+  "sheet": "processed/ui-chrome-kit-transparent.png",
+  "pieces": [
+    {
+      "file": "ui/piece_00.png",
+      "x": 15,
+      "y": 9,
+      "w": 126,
+      "h": 212
+    },
+    {
+      "file": "ui/piece_02.png",
+      "x": 794,
+      "y": 19,
+      "w": 95,
+      "h": 322
+    },
+    {
+      "file": "ui/piece_03.png",
+      "x": 863,
+      "y": 13,
+      "w": 572,
+      "h": 64
+    },
+    {
+      "file": "ui/piece_04.png",
+      "x": 948,
+      "y": 61,
+      "w": 368,
+      "h": 213
+    },
+    {
+      "file": "ui/piece_06.png",
+      "x": 1451,
+      "y": 10,
+      "w": 49,
+      "h": 224
+    },
+    {
+      "file": "ui/piece_07.png",
+      "x": 1362,
+      "y": 111,
+      "w": 112,
+      "h": 101
+    },
+    {
+      "file": "ui/piece_10.png",
+      "x": 1431,
+      "y": 245,
+      "w": 101,
+      "h": 67
+    },
+    {
+      "file": "ui/piece_11.png",
+      "x": 32,
+      "y": 359,
+      "w": 322,
+      "h": 121
+    },
+    {
+      "file": "ui/piece_12.png",
+      "x": 378,
+      "y": 367,
+      "w": 266,
+      "h": 101
+    },
+    {
+      "file": "ui/piece_13.png",
+      "x": 667,
+      "y": 367,
+      "w": 283,
+      "h": 109
+    },
+    {
+      "file": "ui/piece_17.png",
+      "x": 20,
+      "y": 483,
+      "w": 103,
+      "h": 145
+    },
+    {
+      "file": "ui/piece_18.png",
+      "x": 345,
+      "y": 500,
+      "w": 135,
+      "h": 400
+    },
+    {
+      "file": "ui/piece_19.png",
+      "x": 390,
+      "y": 538,
+      "w": 227,
+      "h": 141
+    },
+    {
+      "file": "ui/piece_20.png",
+      "x": 443,
+      "y": 507,
+      "w": 248,
+      "h": 437
+    },
+    {
+      "file": "ui/piece_21.png",
+      "x": 569,
+      "y": 558,
+      "w": 90,
+      "h": 302
+    },
+    {
+      "file": "ui/piece_22.png",
+      "x": 690,
+      "y": 511,
+      "w": 96,
+      "h": 116
+    },
+    {
+      "file": "ui/piece_23.png",
+      "x": 776,
+      "y": 515,
+      "w": 229,
+      "h": 353
+    },
+    {
+      "file": "ui/piece_24.png",
+      "x": 1159,
+      "y": 533,
+      "w": 100,
+      "h": 92
+    },
+    {
+      "file": "ui/piece_25.png",
+      "x": 1284,
+      "y": 544,
+      "w": 78,
+      "h": 73
+    },
+    {
+      "file": "ui/piece_26.png",
+      "x": 1386,
+      "y": 534,
+      "w": 100,
+      "h": 101
+    },
+    {
+      "file": "ui/piece_30.png",
+      "x": 1159,
+      "y": 661,
+      "w": 87,
+      "h": 76
+    },
+    {
+      "file": "ui/piece_31.png",
+      "x": 1269,
+      "y": 663,
+      "w": 73,
+      "h": 75
+    },
+    {
+      "file": "ui/piece_32.png",
+      "x": 1372,
+      "y": 698,
+      "w": 80,
+      "h": 65
+    },
+    {
+      "file": "ui/piece_33.png",
+      "x": 1109,
+      "y": 772,
+      "w": 253,
+      "h": 83
+    },
+    {
+      "file": "ui/piece_34.png",
+      "x": 29,
+      "y": 863,
+      "w": 86,
+      "h": 80
+    },
+    {
+      "file": "ui/piece_35.png",
+      "x": 377,
+      "y": 843,
+      "w": 84,
+      "h": 82
+    },
+    {
+      "file": "ui/piece_36.png",
+      "x": 720,
+      "y": 869,
+      "w": 67,
+      "h": 55
+    },
+    {
+      "file": "ui/piece_37.png",
+      "x": 1185,
+      "y": 858,
+      "w": 282,
+      "h": 87
+    }
+  ],
+  "note": "Rename pieces by role after visual check (panel, button-amber, hp-bar, draft-card, \u2026)."
+}
