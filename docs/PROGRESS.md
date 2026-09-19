@@ -122,6 +122,8 @@
 
 | 2026-09-19 | UI polish | S01 S04 S07 PASS | Player HP bar+numeric HUD; stage themes + warm chrome palette; browser verified. |
 
+| 2026-09-19 | P0 black screen | S01 S02 S07 S08 PASS | Chapter clear stuck black: ArenaSystem StaticGroup.clear on SHUTDOWN after physics teardown threw and aborted Result start. Guarded clearObstacles; safe GameScene shutdown; fadeToScene timeout fallback. Browser: clear→Result→Hub, death→Result→retry, endless death, draft/pause, corrupt save. Vitest 71. |
+
 
 ## Rule
 

@@ -1208,24 +1208,34 @@ export class GameScene extends Phaser.Scene {
     window.removeEventListener('focus', this.onFocus);
     for (const u of this.unsubs) u();
     this.unsubs = [];
-    this.joystick.destroy(this);
-    this.tutorial?.destroy();
-    this.tutorial = null;
-    this.pauseMenu.destroy();
-    this.comboPopup.destroy();
-    this.draftUI.destroy();
-    this.xp.destroy();
-    this.spawner.destroy();
-    this.hazards.destroy();
-    this.bosses.destroy();
-    this.allies.destroy();
-    this.endless.destroy();
-    this.enemies.destroy();
-    this.skills.destroy();
-    this.combat.destroy();
-    this.dummy.destroy();
-    this.player.destroy();
-    this.arena.destroy();
+    // Never throw during SHUTDOWN — an exception aborts scene.start(next) (black screen).
+    const safe = (label: string, fn: () => void): void => {
+      try {
+        fn();
+      } catch (err) {
+        console.warn(`[GameScene shutdown] ${label}`, err);
+      }
+    };
+    safe('joystick', () => this.joystick.destroy(this));
+    safe('tutorial', () => {
+      this.tutorial?.destroy();
+      this.tutorial = null;
+    });
+    safe('pauseMenu', () => this.pauseMenu.destroy());
+    safe('comboPopup', () => this.comboPopup.destroy());
+    safe('draftUI', () => this.draftUI.destroy());
+    safe('xp', () => this.xp.destroy());
+    safe('spawner', () => this.spawner.destroy());
+    safe('hazards', () => this.hazards.destroy());
+    safe('bosses', () => this.bosses.destroy());
+    safe('allies', () => this.allies.destroy());
+    safe('endless', () => this.endless.destroy());
+    safe('enemies', () => this.enemies.destroy());
+    safe('skills', () => this.skills.destroy());
+    safe('combat', () => this.combat.destroy());
+    safe('dummy', () => this.dummy.destroy());
+    safe('player', () => this.player.destroy());
+    safe('arena', () => this.arena.destroy());
   }
 }
 

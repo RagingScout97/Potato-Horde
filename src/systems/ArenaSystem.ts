@@ -367,6 +367,8 @@ export class ArenaSystem {
   destroy(): void {
     this.pulseTween?.stop();
     this.pulseTween = null;
+    this.playerCollider?.destroy();
+    this.playerCollider = null;
     for (const d of this.dust) d.gfx.destroy();
     this.dust = [];
     this.haze?.destroy();
@@ -376,6 +378,7 @@ export class ArenaSystem {
     this.minimap?.destroy();
     this.spawnMarker?.destroy();
     this.safeZone?.destroy();
+    // Physics plugin may already have torn down StaticGroup.children on SHUTDOWN.
     this.clearObstacles();
   }
 
@@ -411,7 +414,10 @@ export class ArenaSystem {
   }
 
   private clearObstacles(): void {
-    this.obstacleGroup.clear(true, true);
+    const group = this.obstacleGroup;
+    // Phaser StaticGroup.clear crashes if children was nulled during physics shutdown.
+    if (!group?.children) return;
+    group.clear(true, true);
   }
 
   private drawGrid(): void {
